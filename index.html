@@ -1,45 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HTML5 canvas</title>
-  </head>
-  <body>
-    <h1>HTML 5 canvas</h1>
-    <h2>Image</h2>
-    <img id="lp" src="./images/lp.jpg" alt="LP image">
-    <p>Data goes in here</p>
-    <canvas id="myCanvas" width="auto" height="auto" style="border:1px solid #d3d3d3;">
-  </body>
-  <script>
-    window.onload = () => {
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-        var img = document.getElementById("lp");
-        
-        // Draw image
-        var hRatio = c.width  / img.width    ;
-        var vRatio =  c.height / img.height  ;
-        var ratio  = Math.min ( hRatio, vRatio );
-        var centerShift_x = ( c.width - img.width*ratio ) / 2;
-        var centerShift_y = ( c.height - img.height*ratio ) / 2;  
-        ctx.clearRect(0,0,c.width, c.height);
-        ctx.drawImage(img, 0,0, img.width, img.height, centerShift_x, centerShift_y,img.width*ratio, img.height*ratio);  
-        
-        // // Green rectangle
-        // ctx.beginPath();
-        // ctx.lineWidth = "4";
-        // ctx.strokeStyle = "green";
-        // ctx.rect(30, 30, 50, 50);
-        // ctx.stroke();
-        
-        // // Blue rectangle
-        // ctx.beginPath();
-        // ctx.lineWidth = "10";
-        // ctx.strokeStyle = "blue";
-        // ctx.rect(50, 50, 150, 80);
-        // ctx.stroke();
-    }
-    </script> 
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTML5 canvas</title>
+</head>
+
+<body>
+  <h1>HTML 5 canvas</h1>
+  <h2>Original Image</h2>
+  <img id="lp" src="./images/bbox.jpg" alt="LP image">
+  <h2>Image with BBoxes</h2>
+  <canvas id="myCanvas" width="auto" height="auto" style="border:1px solid #d3d3d3;">
+</body>
+<script>
+  window.onload = () => {
+    var annotations = [
+      {
+        topLeftX: 4.2211914,
+        topLeftY: 2.4787326,
+        bottomRightX: 9.814453,
+        bottomRightY: 14.848524,
+        value: '3'
+      },
+      {
+        topLeftX: 10.369873,
+        topLeftY: 2.4787326,
+        bottomRightX: 15.073242,
+        bottomRightY: 14.961371,
+        value: '7'
+      },
+      {
+        topLeftX: 18.035889,
+        topLeftY: 2.1467013,
+        bottomRightX: 23.516846,
+        bottomRightY: 15.516927,
+        value: '3'
+      },
+      {
+        topLeftX: 23.961182,
+        topLeftY: 2.0360243,
+        bottomRightX: 29.332275,
+        bottomRightY: 15.404079,
+        value: '9'
+      },
+      {
+        topLeftX: 29.849854,
+        topLeftY: 1.8125,
+        bottomRightX: 34.368896,
+        bottomRightY: 15.516927,
+        value: '7'
+      }
+    ]
+
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    var img = document.getElementById("lp");
+
+    // Draw image
+    var hRatio = c.width / img.width;
+    var vRatio = c.height / img.height;
+    var ratio = Math.min(hRatio, vRatio);
+    const scaled_img_height = img.height * ratio;
+    const scaled_img_width = img.width * ratio;
+    c.height = img.height * ratio;
+    ctx.drawImage(
+      img, // Image
+      0, // Start clipping image X
+      0, // Start clipping image Y
+      img.width, // Width of image to be clipped
+      img.height, // Height of image to be clipped
+      0, // Place clipped image X
+      0, // Place clipped image Y
+      scaled_img_width, // Width of clipped image
+      scaled_img_height // Height of clipped image
+    );
+
+    // Draw BBoxes for points given
+    annotations.forEach(annotation => {
+      const bbox_top_left_x = annotation.topLeftX * ratio;
+      const bbox_top_left_y = annotation.topLeftY * ratio;
+      const bbox_width = (annotation.bottomRightX - annotation.topLeftX) * ratio;
+      const bbox_height = (annotation.bottomRightY - annotation.topLeftY) * ratio;
+
+      ctx.strokeRect(
+        bbox_top_left_x, 
+        bbox_top_left_y, 
+        bbox_width, 
+        bbox_height
+      );
+      ctx.font = "20px Georgia";
+      ctx.strokeText(annotation.value, bbox_top_left_x, bbox_top_left_y + 15);
+    })
+  }
+</script>
+
 </html>
